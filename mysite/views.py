@@ -9,7 +9,7 @@ def index(request):
 
 def removepunc(request):
     #Get the text
-    djtext = request.GET.get('text', 'default')
+    djtext = request.POST.get('text', 'default')
     print(djtext)
     #Analyze the text
     return HttpResponse("remove punc")
@@ -17,13 +17,13 @@ def removepunc(request):
 
 def analyze(request):
     #Get the text
-    djtext = request.GET.get('text', 'default')
+    djtext = request.POST.get('text', 'default')
 
     # Check checkbox values
-    removepunc = request.GET.get('removepunc', 'off')
-    fullcaps = request.GET.get('fullcaps', 'off')
-    newlineremover = request.GET.get('newlineremover', 'off')
-    extraspaceremover = request.GET.get('extraspaceremover', 'off')
+    removepunc = request.POST.get('removepunc', 'off')
+    fullcaps = request.POST.get('fullcaps', 'off')
+    newlineremover = request.POST.get('newlineremover', 'off')
+    extraspaceremover = request.POST.get('extraspaceremover', 'off')
 
     #Check which checkbox is on
     if removepunc == "on":
@@ -33,10 +33,45 @@ def analyze(request):
             if char not in punctuations:
                 analyzed = analyzed + char
         params = {'purpose':'Removed Punctuations', 'analyzed_text': analyzed}
-        return render(request, 'analyze.html', params)
+        djtext=analyzed
 
-    else:
-        return HttpResponse("Error")
+    if fullcaps == "on":
+        analyzed=""
+        for char in djtext:
+            analyzed = analyzed + char.upper()
+        params = {'purpose':'capitalize', 'analyzed_text': analyzed}
+        djtext=analyzed
+
+
+    if newlineremover == "on":
+        analyzed=""
+        for char in djtext:
+            print(char)
+            if char != '\n' and char != '\r':
+                analyzed = analyzed + char
+        params = {'purpose':'capitalize', 'analyzed_text': analyzed}
+        djtext=analyzed
+
+    if (extraspaceremover == "on"):
+        analyzed=""
+        for index, char in enumerate(djtext):
+            if djtext[index] == " " and djtext[index+1] == " ":
+                pass
+
+            else:
+                analyzed = analyzed + char
+
+        params = {'purpose':'capitalize', 'analyzed_text': analyzed}
+        djtext=analyzed
+
+    if (removepunc != "on" and fullcaps != "on" and newlineremover != "on" and extraspaceremover != "on"):
+        return HttpResponse("plz select checkbox")
+
+        
+        
+    return render(request, 'analyze.html', params)
+        
+
 
 # def capfirst(request):
 #     return HttpResponse("capitalize first")
